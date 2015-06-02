@@ -1,0 +1,16 @@
+[AnaLog]
+Listen = :3001
+Worker = 3
+Workspace = ./
+CookieSecret = secret
+DevelopmentEnv
+
+[Influx]
+Host = localhost
+Port = 8086
+Database = anaLog
+User = root
+Pass = root
+
+[AppLog]
+;SlackLogUrl = https://hooks.slack.com/services...

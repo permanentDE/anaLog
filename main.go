@@ -1,7 +1,7 @@
 package main
 
 import (
-	anaLog "permanent/anaLog/v1"
+	anaLog "go.permanent.de/anaLog/v1"
 	"runtime"
 )
 
