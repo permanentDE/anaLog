@@ -1,106 +1,91 @@
 package persistence
 
 import (
-	"encoding/json"
-	"fmt"
-	//"strconv"
-
-	"github.com/influxdb/influxdb/client"
+	"errors"
 
 	"go.permanent.de/anaLog/v1/anaLog/logpoint"
 	"go.permanent.de/anaLog/v1/anaLog/persistence/influx"
+	"go.permanent.de/anaLog/v1/anaLog/persistence/mongo"
+	"go.permanent.de/anaLog/v1/anaLog/state"
+	"go.permanent.de/anaLog/v1/config"
 )
 
+func Close() {
+	if persistenceAdapter != nil {
+		getAdapter().Close()
+	}
+}
+
+var persistenceAdapter Adapter
+
+var (
+	NXlogpoint error = errors.New("LogPoint not found")
+)
+
+type Adapter interface {
+	/*	GetPoint(string) (logpoint.LogPoint, error)
+		UpsertPoint(logpoint.LogPoint) error*/
+	StorePoint(logpoint.LogPoint) error
+	StorePoints(...logpoint.LogPoint) error
+	GetRecurring() (map[string]map[string]map[string]logpoint.LogPoint, error)
+	StoreAnalysisRCserial([]byte) error
+	GetLatestAnalysisRCserial() ([]byte, error)
+	GetEndByStart(logpoint.LogPoint) (logpoint.LogPoint, error)
+	GetLastBegin(string) (logpoint.LogPoint, error)
+	Close()
+}
+
+func getAdapter() Adapter {
+	if persistenceAdapter == nil {
+		if config.AnaLog.UseInflux {
+			persistenceAdapter = influx.GetAdapter()
+		} else if config.AnaLog.UseMongo {
+			persistenceAdapter = mongo.GetAdapter()
+		}
+	}
+	return persistenceAdapter
+}
+
 func StorePoint(lp logpoint.LogPoint) error {
-	return StorePoints(lp)
+	return getAdapter().StorePoint(lp)
 }
 
 func StorePoints(lps ...logpoint.LogPoint) error {
-	var points []client.Point
-
-	for _, lp := range lps {
-
-		byt, err := json.Marshal(lp)
-		if err != nil {
-			return err
-		}
-
-		fields := map[string]interface{}{
-			"task":       lp.Task,
-			"identifier": lp.RunId,
-			"logpoint":   string(byt),
-		}
-
-		if lp.Message != "" {
-			fields["message"] = lp.Message
-		}
-
-		if lp.Raw != "" {
-			fields["raw"] = lp.Raw
-		}
-
-		if len(lp.Data) > 0 {
-			fields["data"] = lp.Data
-		}
-
-		points = append(points, client.Point{
-			Name: "logentries_" + lp.Task,
-			Time: lp.Time,
-			Tags: map[string]string{
-				"host":     lp.Host,
-				"mode":     fmt.Sprint(lp.Mode),
-				"priority": fmt.Sprint(lp.Priority),
-				"state":    fmt.Sprint(lp.State),
-				//"analyzed": strconv.FormatBool(lp.Analyzed),
-			},
-			Fields:    fields,
-			Precision: "n",
-		})
-	}
-
-	return influx.InsertBatch(points)
+	return getAdapter().StorePoints(lps...)
 }
 
 func GetRecurring() (map[string]map[string]map[string]logpoint.LogPoint, error) {
-	//------------------task-----identifier----state------------------
-	table := make(map[string]map[string]map[string]logpoint.LogPoint)
-
-	results, err := influx.QueryDB("SELECT * FROM /^logentries_.*/;")
-	if err != nil {
-		return table, err
-	}
-
-	for _, result := range results {
-		for _, row := range result.Series {
-			columns := make(map[string]int)
-			for key, column := range row.Columns {
-				columns[column] = key
-			}
-
-			for _, fields := range row.Values {
-				lpbytes := []byte(fields[columns["logpoint"]].(string))
-				var lp logpoint.LogPoint
-				err = json.Unmarshal(lpbytes, &lp)
-				if err != nil {
-					return table, err
-				}
-
-				_, ok := table[lp.Task]
-				if ok {
-					_, ok = table[lp.Task][lp.RunId]
-					if !ok {
-						table[lp.Task][lp.RunId] = make(map[string]logpoint.LogPoint)
-					}
-				} else {
-					table[lp.Task] = make(map[string]map[string]logpoint.LogPoint)
-					table[lp.Task][lp.RunId] = make(map[string]logpoint.LogPoint)
-				}
-
-				table[lp.Task][lp.RunId][fmt.Sprint(lp.State)] = lp
-
-			}
-		}
-	}
-
-	return table, err
+	//--------------------task----identifier---state------------------
+	return getAdapter().GetRecurring()
 }
+
+func StoreAnalysisRCserial(lrc []byte) error {
+	return getAdapter().StoreAnalysisRCserial(lrc)
+}
+
+func GetLatestAnalysisRCserial() ([]byte, error) {
+	return getAdapter().GetLatestAnalysisRCserial()
+}
+
+func GetEndByStart(begin logpoint.LogPoint) (logpoint.LogPoint, error) {
+	ret, err := getAdapter().GetEndByStart(begin)
+	if err != nil {
+		return ret, nil
+	} else if ret.State == state.Unknown && ret.RunId != begin.RunId {
+		return ret, NXlogpoint
+	}
+	return ret, err
+}
+
+func GetLastBegin(taskname string) (logpoint.LogPoint, error) {
+	return getAdapter().GetLastBegin(taskname)
+}
+
+/*func GetPoint(identifier string) (logpoint.LogPoint, error) {
+	return getAdapter().GetPoint(identifier)
+}
+
+func UpsertPoint(lp logpoint.LogPoint) error {
+	return getAdapter().UpsertPoint(lp)
+}
+*/

@@ -27,5 +27,9 @@ func provision(r *mux.Router) *mux.Router {
 
 	v1Push.Handle("/recurring/analyze", webapp.Handler(handler.AnalyzeRecurring)).Methods("GET")
 
+	v1Nagios := v1.PathPrefix("/nagios").Subrouter()
+	v1Nagios.Handle("/status", webapp.Handler(handler.NagiosStatus)).Methods("GET")
+	v1Nagios.Handle("/reset", webapp.Handler(handler.NagiosReset)).Methods("GET", "POST")
+
 	return r
 }

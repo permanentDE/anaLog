@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/fcgi"
 
+	"github.com/badgerodon/socketmaster/client"
+	"github.com/badgerodon/socketmaster/protocol"
 	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/iDnegroniLog"
 
@@ -22,23 +24,42 @@ func preflight(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 func Listen() {
 	logger := iDnegroniLog.NewMiddleware(idl.StandardLogger())
 
-	logger.Stack2Http = config.Std.AnaLog.DevelopmentEnv
+	logger.Stack2Http = config.AnaLog.DevelopmentEnv
 
 	n := negroni.New(logger /*negroni.NewStatic(http.Dir(helper.GetFilePath("./public")))*/)
 
-	cookiestore := cookiestore.New([]byte(config.Std.AnaLog.CookieSecret))
+	cookiestore := cookiestore.New([]byte(config.AnaLog.CookieSecret))
 	n.Use(sessions.Sessions("perm_analog_session", cookiestore))
 	n.Use(negroni.HandlerFunc(preflight))
 
 	n.UseHandler(router.New())
 
-	if config.Std.AnaLog.Fcgi {
-		listener, err := net.Listen("tcp", config.Std.AnaLog.Listen)
+	if config.AnaLog.UseSocketMaster {
+		listener, err := client.Listen(protocol.SocketDefinition{
+			Port: config.SocketMaster.Port,
+			HTTP: &protocol.SocketHTTPDefinition{
+				DomainSuffix: config.SocketMaster.DomainSuffix,
+				PathPrefix:   config.SocketMaster.PathPrefix,
+			},
+			/*TLS: &protocol.SocketTLSDefinition{
+				Cert: config.SocketMaster.Cert,
+				Key:  config.SocketMaster.Key,
+			},*/
+		})
 		if err != nil {
 			idl.Emerg(err)
 		}
+		idl.Notice("Serving via SocketMaster")
+		http.Serve(listener, n)
+	} else if config.AnaLog.Fcgi {
+		listener, err := net.Listen("tcp", config.AnaLog.Listen)
+		if err != nil {
+			idl.Emerg(err)
+		}
+		idl.Notice("Serving via FastCGI")
 		fcgi.Serve(listener, n)
 	} else {
-		n.Run(config.Std.AnaLog.Listen)
+		idl.Notice("Serving via inbuilt HTTP Server")
+		n.Run(config.AnaLog.Listen)
 	}
 }

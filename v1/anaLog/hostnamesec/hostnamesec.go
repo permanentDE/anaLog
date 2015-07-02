@@ -5,11 +5,17 @@ import (
 	"net"
 	"os"
 	"strings"
+
+	"go.permanent.de/anaLog/v1/config"
 )
 
-var ownHost string = "iondynamics.net"
+var ownHost string
 
 func GetValidHost(remoteAddrPort string) (string, error) {
+	if config.AnaLog.DevelopmentEnv {
+		return "permanent.de", nil
+	}
+
 	var err error
 	if ownHost == "" {
 		ownHost, err = os.Hostname()
@@ -19,12 +25,14 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 		ownHost = removeSubdomains(ownHost)
 	}
 
-	_, _, err = net.SplitHostPort(remoteAddrPort)
+	var remoteAddr string
+
+	remoteAddr, _, err = net.SplitHostPort(remoteAddrPort)
 	if err != nil {
 		return "", err
 	}
 
-	names, err := net.LookupAddr("148.251.239.54") //remoteAddr)
+	names, err := net.LookupAddr(remoteAddr)
 	if err != nil {
 		return "", err
 	}

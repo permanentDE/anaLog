@@ -12,6 +12,8 @@ import (
 
 	"go.permanent.de/anaLog/v1/anaLog"
 	"go.permanent.de/anaLog/v1/anaLog/hostnamesec"
+	"go.permanent.de/anaLog/v1/anaLog/nagios"
+	"go.permanent.de/anaLog/v1/config"
 )
 
 func NotFound(w http.ResponseWriter, req *http.Request) *webapp.Error {
@@ -72,6 +74,49 @@ func PushRecurringEnd(w http.ResponseWriter, req *http.Request) *webapp.Error {
 }
 
 func AnalyzeRecurring(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	fmt.Fprint(w, anaLog.AnalyzeRecurring())
+	_, err := hostnamesec.GetValidHost(req.RemoteAddr)
+	if err != nil {
+		idl.Emerg(err)
+	}
+	ta, err := anaLog.AnalyzeRecurring()
+	fmt.Fprintln(w, ta, err)
+	return nil
+}
+
+func NagiosStatus(w http.ResponseWriter, req *http.Request) *webapp.Error {
+	fmt.Fprintln(w, nagios.Status())
+	return nil
+}
+
+func NagiosReset(w http.ResponseWriter, req *http.Request) *webapp.Error {
+	if nagios.Status() == nagios.OkStatus {
+		fmt.Fprintln(w, "OK")
+		return nil
+	}
+
+	ns := req.FormValue("nagios-secret")
+	if ns != "" {
+		if ns != config.AnaLog.NagiosSecret {
+			http.Error(w, "Invalid secret", http.StatusUnauthorized)
+			return nil
+		} else {
+			nagios.SetOK()
+			fmt.Fprintln(w, "OK")
+			return nil
+		}
+	}
+
+	fmt.Fprintln(w, `
+		<!DOCTYPE html>
+		<html>
+			<body>
+				<form method="POST">
+					<input type="text" name="nagios-secret">
+					<input type="submit">
+				</form>
+			</body>
+		</html>
+	`)
+
 	return nil
 }

@@ -3,7 +3,6 @@ package anaLog
 import (
 	"math/rand"
 	"strconv"
-	"sync"
 	"time"
 
 	"go.iondynamics.net/iDhelper/randGen"
@@ -13,6 +12,7 @@ import (
 	"go.permanent.de/anaLog/v1/anaLog/logpoint"
 	"go.permanent.de/anaLog/v1/anaLog/mode"
 	"go.permanent.de/anaLog/v1/anaLog/persistence"
+	"go.permanent.de/anaLog/v1/anaLog/scheduler"
 	"go.permanent.de/anaLog/v1/anaLog/state"
 )
 
@@ -20,20 +20,23 @@ func newRunId() string {
 	return strconv.Itoa(int(time.Now().UnixNano())) + "_" + randGen.String(64)
 }
 
+func Close() {
+	persistence.Close()
+}
+
 func GenerateSampleData() interface{} {
 	var points []logpoint.LogPoint
 
 	rand.Seed(time.Now().UnixNano())
-	//return randGen.String(123)
 	day := 24 * time.Hour
-	monthStart := time.Now().Add(-1 * day * 1000)
-	for i := 0; i < 1000; i++ {
+	monthStart := time.Now().Add(-1 * day * 100)
+	for i := 0; i < 100; i++ {
 		taskStart := monthStart.Add(day * time.Duration(i))
-		taskEnd := taskStart.Add(500 * time.Second).Add(time.Duration(rand.Intn(100)) * time.Second)
+		taskEnd := taskStart.Add(30 * time.Second).Add(time.Duration(rand.Intn(10)) * time.Second)
 		startLp := logpoint.LogPoint{
 			RunId:    newRunId(),
-			Task:     "sampleData",
-			Host:     "example.permanent.de",
+			Task:     "testData",
+			Host:     "test.permanent.de",
 			Mode:     mode.Recurring,
 			Priority: priority.Informational,
 			State:    state.Started,
@@ -58,6 +61,7 @@ func PushRecurringBegin(task, host string) (string, error) {
 		State:    state.Started,
 		Time:     time.Now(),
 	}
+	go scheduler.RecurringTaskIncoming(lp)
 	return lp.RunId, persistence.StorePoint(lp)
 }
 
@@ -75,88 +79,39 @@ func PushRecurringEnd(task, host, identifier, stateStr, requestBody string) erro
 	return persistence.StorePoint(lp)
 }
 
-func AnalyzeRecurring() interface{} {
-	//return GenerateSampleData()//don't execute this more than once
-
-	table, err := persistence.GetRecurring()
-	if err != nil {
-		return err
+func AnalyzeRecurring() (*analysis.ResultContainer, error) {
+	//return GenerateSampleData() //don't execute this more than once
+	/*lp := logpoint.LogPoint{
+		RunId:    "1435242237863904600_TY1IFnZMJgJ2oQ1cbCZ1Noc7srSpTk2GqvWvyCFRkjiH9KtBLtLk21TResavgeAr",
+		Task:     "testData",
+		Host:     "test.permanent.de",
+		Mode:     mode.Recurring,
+		Priority: priority.Informational,
+		State:    state.Started,
+		Time:     time.Now(),
 	}
 
-	taskDurations := make(map[string][]time.Duration)
-	taskAnalysis := make(map[string]map[string]time.Duration)
+	go scheduler.RecurringTaskIncoming(lp)*/
 
-	for task, idstatemap := range table {
-	RunIterator:
-		for id, statemap := range idstatemap {
-			_ = id
-			var startLp logpoint.LogPoint
-			var endLp logpoint.LogPoint
+	analysis.CheckRecurredTaskBegin("testData")
 
-			var foundStart bool
-			var foundEnd bool
+	return analysis.GetRecurringResultContainer()
+}
 
-		StartEndLookup:
-			for _, lp := range statemap {
-				if !foundStart && lp.State == state.Started {
-					startLp = lp
-					foundStart = true
-				}
-				if !foundEnd && lp.State != state.Started && lp.State != state.Running && lp.State != state.Unknown {
-					endLp = lp
-					foundEnd = true
-				}
+func diff(X, Y []time.Duration) []time.Duration {
+	m := make(map[time.Duration]int)
 
-				if foundStart && foundEnd {
-					break StartEndLookup //short circuit
-				}
-			}
-
-			if !(foundStart && foundEnd) {
-				continue RunIterator //incomplete tuple
-			}
-
-			duration := endLp.Time.Sub(startLp.Time)
-			previous := taskDurations[task]
-			previous = append(previous, duration)
-			taskDurations[task] = previous
+	for _, y := range Y {
+		m[y]++
+	}
+	var ret []time.Duration
+	for _, x := range X {
+		if m[x] > 0 {
+			m[x]--
+			continue
 		}
-		taskAnalysis[task] = make(map[string]time.Duration)
+		ret = append(ret, x)
 	}
 
-	outerWg := sync.WaitGroup{}
-	for task, durations := range taskDurations {
-		outerWg.Add(1)
-
-		go func() {
-			precision := time.Millisecond
-
-			internalWg := sync.WaitGroup{}
-			internalWg.Add(4)
-			go func() {
-				taskAnalysis[task]["avg"] = analysis.Avg(durations)
-				internalWg.Done()
-			}()
-			go func() {
-				taskAnalysis[task]["stdDeviation"] = analysis.StdDev(durations, precision)
-				internalWg.Done()
-			}()
-
-			qrDur := analysis.QuartileReduce(durations)
-
-			go func() {
-				taskAnalysis[task]["avgQr"] = analysis.Avg(qrDur)
-				internalWg.Done()
-			}()
-			go func() {
-				taskAnalysis[task]["stdDeviationQr"] = analysis.StdDev(qrDur, precision)
-				internalWg.Done()
-			}()
-			outerWg.Done()
-		}()
-
-	}
-	outerWg.Wait()
-
-	return taskAnalysis
+	return ret
 }

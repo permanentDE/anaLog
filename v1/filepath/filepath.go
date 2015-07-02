@@ -23,8 +23,8 @@ func GetWorkspace() string {
 	var path string
 	var err error
 
-	if config.Std.AnaLog.Workspace != "" {
-		path = config.Std.AnaLog.Workspace
+	if config.AnaLog.Workspace != "" {
+		path = config.AnaLog.Workspace
 	} else {
 		path = filepath.Dir(os.Args[0])
 	}

@@ -1,8 +1,14 @@
 [AnaLog]
-Listen = :3001
+; UseInflux
+UseMongo
+SchedulerInterval = 10s
 Worker = 3
 Workspace = ./
 CookieSecret = secret
+NagiosSecret = secret
+Listen = :3001
+; Fcgi
+; UseSocketMaster
 DevelopmentEnv
 
 [Influx]
@@ -12,5 +18,19 @@ Database = anaLog
 User = root
 Pass = root
 
+[Mongo]
+Host = localhost
+; Port = 1234
+; Database = anaLog
+; User = root
+; Pass = root
+
+[SocketMaster]
+Port = 3001
+; DomainSuffix = analog.permanent.dev:3000
+; PathPrefix = /a
+; Cert ; PEM encoded string
+; Key ; PEM encoded string
+
 [AppLog]
-;SlackLogUrl = https://hooks.slack.com/services...
+; SlackLogUrl = https://hooks.slack.com/services...
