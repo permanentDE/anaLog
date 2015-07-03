@@ -1,0 +1,143 @@
+{
+	"ImportPath": "go.permanent.de/anaLog",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/gcfg",
+			"Rev": "c2d3050044d05357eaf6c3547249ba57c5e235cb"
+		},
+		{
+			"ImportPath": "github.com/armon/go-metrics",
+			"Rev": "b2d95e5291cdbc26997d1301a5e467ecbb240e25"
+		},
+		{
+			"ImportPath": "github.com/badgerodon/socketmaster/client",
+			"Rev": "7b1081aba40ba399e45f25153004cbe91e7bff32"
+		},
+		{
+			"ImportPath": "github.com/badgerodon/socketmaster/protocol",
+			"Rev": "7b1081aba40ba399e45f25153004cbe91e7bff32"
+		},
+		{
+			"ImportPath": "github.com/boltdb/bolt",
+			"Comment": "v1.0-111-g04a3e85",
+			"Rev": "04a3e85793043e76d41164037d0d7f9d53eecae3"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/negroni",
+			"Comment": "v0.1-70-gc7477ad",
+			"Rev": "c7477ad8e330bef55bf1ebe300cf8aa67c492d1b"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/proto",
+			"Rev": "64f27bf06efee53589314a6e5a4af34cdd85adf6"
+		},
+		{
+			"ImportPath": "github.com/goincremental/negroni-sessions",
+			"Rev": "3a608a11e2cbf66aa313a850fe65b159a154fb4b"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "67cbcadfc96f21404e1d5ef40e7f3b35b0a073c5"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "47e8f450ef38c857cdd922ec08862ca9d65a1c6d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/securecookie",
+			"Rev": "68004d2ba3cbc80d3a9949ea431b5c9f22ee8707"
+		},
+		{
+			"ImportPath": "github.com/gorilla/sessions",
+			"Rev": "f61c3ec2cf65d69e7efedfd4d060fe128882c951"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/go-msgpack/codec",
+			"Rev": "fa3f63826f7c23912c15263591e65d54d080b458"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/raft",
+			"Rev": "4165b47aca63ce628b65bde39d77b06acf8367ba"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/raft-boltdb",
+			"Rev": "d1e82c1ec3f15ee991f7cc7ffd5b67ff6f5bbaee"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/yamux",
+			"Rev": "b2e55852ddaf823a85c67f798080eb7d08acd71d"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/client",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/influxql",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/meta",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/snapshot",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/toml",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/tsdb",
+			"Comment": "v0.9.1-rc1-77-gffae1c9",
+			"Rev": "ffae1c9ff795a3cae3464e11f6635a92f8e12da0"
+		},
+		{
+			"ImportPath": "github.com/johntdyer/slack-go",
+			"Rev": "88736fd63eed11c942b478c3182bdd2f152971e5"
+		},
+		{
+			"ImportPath": "go.iondynamics.net/iDhelper/randGen",
+			"Rev": "2f1618a53d01c6d1e85a02cb13775ab503209755"
+		},
+		{
+			"ImportPath": "go.iondynamics.net/iDlogger",
+			"Rev": "6d55daa9e6bffb1808875986f450005c64d4c11e"
+		},
+		{
+			"ImportPath": "go.iondynamics.net/iDnegroniLog",
+			"Rev": "c2e58b2af53c846d0da7dad0bd112842c63444a9"
+		},
+		{
+			"ImportPath": "go.iondynamics.net/iDslackLog",
+			"Rev": "d0d1d8f518cc15a83fcc57590253b4ea8a00f958"
+		},
+		{
+			"ImportPath": "go.iondynamics.net/webapp",
+			"Rev": "0483f968d2a5b1e60e45a24f62084693fe16ff81"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "cc04154d65fb9296747569b107cfd05380b1ea3e"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "cc04154d65fb9296747569b107cfd05380b1ea3e"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2015.06.03-3-g3569c88",
+			"Rev": "3569c88678d88179dcbd68d02ab081cbca3cd4d0"
+		}
+	]
+}
