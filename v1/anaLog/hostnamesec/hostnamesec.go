@@ -6,10 +6,12 @@ import (
 	"os"
 	"strings"
 
+	idl "go.iondynamics.net/iDlogger"
+
 	"go.permanent.de/anaLog/v1/config"
 )
 
-var ownHost string
+var ownDomain string
 
 func GetValidHost(remoteAddrPort string) (string, error) {
 	if config.AnaLog.DevelopmentEnv {
@@ -17,13 +19,15 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 	}
 
 	var err error
-	if ownHost == "" {
-		ownHost, err = os.Hostname()
+	if ownDomain == "" {
+		ownDomain, err = os.Hostname()
 		if err != nil {
 			return "", err
 		}
-		ownHost = removeSubdomains(ownHost)
+		ownDomain = removeSubdomains(ownDomain)
 	}
+
+	idl.Debug(ownDomain)
 
 	var remoteAddr string
 
@@ -38,9 +42,11 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 	}
 
 	for _, name := range names {
-		if removeSubdomains(name) == ownHost {
+		remoteDomain := removeSubdomains(name)
+		if remoteDomain == ownDomain {
 			return name, nil
 		}
+		idl.Debug(remoteDomain)
 	}
 
 	return "", errors.New("invalid request")

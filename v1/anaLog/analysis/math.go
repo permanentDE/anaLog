@@ -93,12 +93,26 @@ func (a ByDuration) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDuration) Less(i, j int) bool { return a[i] < a[j] }
 
 func QuartileReduce(durations []time.Duration) (reduced []time.Duration) {
-	tbs := append([]time.Duration{}, durations...)
+	if len(durations) < 1 {
+		return
+	}
 
+	tbs := append([]time.Duration{}, durations...)
 	sort.Sort(ByDuration(tbs))
 
-	lowest := tbs[int(math.Floor(0.25*float64(len(tbs)))+1)]
-	hightest := tbs[int(math.Floor(0.75*float64(len(tbs)))+1)]
+	lowIndex := int(math.Floor(0.25*float64(len(tbs))) + 1)
+	highIndex := int(math.Floor(0.75*float64(len(tbs))) + 1)
+
+	if lowIndex < 0 || lowIndex >= len(tbs) {
+		lowIndex = 0
+	}
+
+	if highIndex < 0 || highIndex >= len(tbs) {
+		highIndex = len(tbs) - 1
+	}
+
+	lowest := tbs[lowIndex]
+	hightest := tbs[highIndex]
 
 	for _, v := range tbs {
 		if v >= lowest && v <= hightest {

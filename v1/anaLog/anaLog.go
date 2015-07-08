@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.iondynamics.net/iDhelper/randGen"
+	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/iDlogger/priority"
 
 	"go.permanent.de/anaLog/v1/anaLog/analysis"
@@ -75,6 +76,9 @@ func PushRecurringEnd(task, host, identifier, stateStr, requestBody string) erro
 		State:    state.Atos(stateStr),
 		Time:     time.Now(),
 		Raw:      requestBody,
+	}
+	if lp.State != state.OK {
+		idl.Warn("Recurring task unsuccessful: "+lp.Task, lp)
 	}
 	return persistence.StorePoint(lp)
 }

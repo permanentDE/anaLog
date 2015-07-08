@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 
@@ -17,6 +18,10 @@ type Result struct {
 
 	IntervalAvg    time.Duration
 	IntervalStdDev time.Duration
+}
+
+func (r Result) String() string {
+	return fmt.Sprint("Avg: ", r.Avg, ", StdDev: ", r.StdDev, ", AvgQr: ", r.AvgQr, ", StdDevQr: ", r.StdDevQr, ", IntervalAvg: ", r.IntervalAvg, ", IntervalStdDev: ", r.IntervalStdDev)
 }
 
 type ResultContainer struct {

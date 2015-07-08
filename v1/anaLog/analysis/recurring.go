@@ -5,8 +5,6 @@ import (
 	"sync"
 	"time"
 
-	idl "go.iondynamics.net/iDlogger"
-
 	"go.permanent.de/anaLog/v1/anaLog/logpoint"
 	"go.permanent.de/anaLog/v1/anaLog/persistence"
 	"go.permanent.de/anaLog/v1/anaLog/state"
@@ -120,7 +118,6 @@ func GetRecurringResultContainer() (*ResultContainer, error) {
 
 			innerWg.Wait()
 			taskAnalysis.Set(name, *result)
-			idl.Debug(result)
 			outerWg.Done()
 		}(task, durations)
 

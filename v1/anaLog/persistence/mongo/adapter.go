@@ -89,8 +89,6 @@ func (a *Adapter) StoreAnalysisRCserial(lrc []byte) error {
 
 	c := a.session.DB(config.Mongo.Database).C("analysis")
 	return c.Insert(BytesTransport(lrc))
-
-	//return fmt.Errorf("%s", "not implemented")
 }
 
 func (a *Adapter) GetLatestAnalysisRCserial() ([]byte, error) {
@@ -104,8 +102,6 @@ func (a *Adapter) GetLatestAnalysisRCserial() ([]byte, error) {
 	c := a.session.DB(config.Mongo.Database).C("analysis")
 	err = c.Find(nil).Sort("-time").One(&tpo)
 	return tpo.Bytes, err
-
-	//return nil, fmt.Errorf("%s", "not implemented")
 }
 
 func (a *Adapter) GetEndByStart(begin logpoint.LogPoint) (logpoint.LogPoint, error) {

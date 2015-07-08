@@ -35,7 +35,7 @@ func CheckRecurringFluctuation() error {
 	defer lastRc.mu.RUnlock()
 
 	warnPre := `Analysis of task "`
-	warnMid := `" found fluctuation in`
+	warnMid := `" found fluctuation in `
 
 	for task, curRes := range currentRc.m {
 		lastRes, ok := lastRc.m[task]
