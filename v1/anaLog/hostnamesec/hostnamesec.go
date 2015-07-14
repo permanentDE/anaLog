@@ -20,11 +20,15 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 
 	var err error
 	if ownDomain == "" {
-		ownDomain, err = os.Hostname()
-		if err != nil {
-			return "", err
+		if config.AnaLog.Domain == "" {
+			ownDomain, err = os.Hostname()
+			if err != nil {
+				return "", err
+			}
+			ownDomain = removeSubdomains(ownDomain)
+		} else {
+			ownDomain = config.AnaLog.Domain
 		}
-		ownDomain = removeSubdomains(ownDomain)
 	}
 
 	idl.Debug(ownDomain)

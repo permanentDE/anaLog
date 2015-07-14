@@ -60,6 +60,7 @@ type AnaLogCfg struct {
 	Workspace         string
 	CookieSecret      string
 	NagiosSecret      string
+	Domain            string
 	DevelopmentEnv    bool
 }
 
