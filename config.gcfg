@@ -10,6 +10,7 @@ Listen = :3001
 ; Fcgi
 ; UseSocketMaster
 DevelopmentEnv
+; Domain = permanent.de
 
 [Influx]
 Host = localhost
