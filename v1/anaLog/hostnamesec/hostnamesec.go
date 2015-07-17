@@ -57,6 +57,7 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 }
 
 func removeSubdomains(subdomain string) string {
+	subdomain = strings.TrimSuffix(subdomain, ".")
 	for {
 		if strings.Count(subdomain, ".") == 1 || strings.Count(subdomain, ".") < 1 {
 			return subdomain

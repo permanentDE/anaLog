@@ -82,7 +82,7 @@ func GetRecurringResultContainer() (*ResultContainer, error) {
 
 			innerWg.Add(1)
 			go func(ds []time.Duration) {
-				result.StdDev = StdDev(ds, time.Second)
+				result.StdDev = StdDev(ds, -1)
 				innerWg.Done()
 			}(durList)
 
@@ -95,7 +95,7 @@ func GetRecurringResultContainer() (*ResultContainer, error) {
 					innerWg.Done()
 				}()
 				go func() {
-					result.IntervalStdDev = StdDev(durs, time.Minute)
+					result.IntervalStdDev = StdDev(durs, -1)
 					innerWg.Done()
 				}()
 				innerWg.Done()
@@ -112,7 +112,7 @@ func GetRecurringResultContainer() (*ResultContainer, error) {
 
 			innerWg.Add(1)
 			go func(ds []time.Duration) {
-				result.StdDevQr = StdDev(ds, time.Second)
+				result.StdDevQr = StdDev(ds, -1)
 				innerWg.Done()
 			}(qrDur)
 

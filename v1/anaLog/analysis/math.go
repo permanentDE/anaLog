@@ -28,7 +28,28 @@ func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
 
 	var diffSqSum float64
 
-	avg := reducePrecision(Avg(durations), precision)
+	fullAvg := Avg(durations)
+
+	//determine precision level dynamically
+	if precision < 1 {
+		switch {
+		case fullAvg > time.Hour:
+			precision = time.Minute
+		case fullAvg > time.Minute:
+			precision = time.Second
+		case fullAvg > time.Second:
+			precision = time.Millisecond
+		case fullAvg > time.Millisecond:
+			precision = time.Microsecond
+		case fullAvg > time.Microsecond:
+			precision = time.Nanosecond
+		default:
+			precision = time.Nanosecond
+		}
+		idl.Debug(precision)
+	}
+
+	avg := reducePrecision(fullAvg, precision)
 
 	for _, duration := range durations {
 		diff := reducePrecision(duration, precision) - avg
@@ -39,7 +60,10 @@ func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
 	stdDeviationApproximation := math.Sqrt(diffSqSum / float64(len(durations)-1))
 
 	if !(stdDeviationApproximation > -1) {
-		idl.Crit("overflow detected - reduce standard deviation precision")
+		if len(durations) > 10 && diffSqSum > float64(5*time.Minute) {
+			idl.Crit("overflow detected - adjust standard deviation precision")
+		}
+		stdDeviationApproximation = 0
 	}
 
 	return time.Duration(stdDeviationApproximation) * precision

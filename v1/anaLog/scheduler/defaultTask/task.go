@@ -18,7 +18,6 @@ func init() {
 func loop(ch chan time.Time) {
 	for {
 		<-ch
-		idl.Info("default task: tick")
 		err := analysis.CheckRecurringFluctuation()
 		if err != nil {
 			idl.Crit("scheduled analysis.Check failed: ", err)

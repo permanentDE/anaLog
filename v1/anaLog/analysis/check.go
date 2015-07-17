@@ -46,37 +46,37 @@ func CheckRecurringFluctuation() error {
 
 		avgDiff := int64(math.Abs(float64(curRes.Avg) - float64(lastRes.Avg)))
 		if avgDiff > int64(lastRes.StdDevQr) {
-			negativeCheck(warnPre + task + warnMid + "Average")
+			//negativeCheck(warnPre + task + warnMid + "Average")
 			idl.Warn(warnPre+task+warnMid+"Average", time.Duration(avgDiff), lastRes, curRes)
 		}
 
 		stdDevDiff := int64(math.Abs(float64(curRes.StdDev) - float64(lastRes.StdDev)))
 		if stdDevDiff > int64(lastRes.StdDevQr) {
-			negativeCheck(warnPre + task + warnMid + "StandardDeviation")
+			//negativeCheck(warnPre + task + warnMid + "StandardDeviation")
 			idl.Warn(warnPre+task+warnMid+"StandardDeviation", time.Duration(stdDevDiff), lastRes, curRes)
 		}
 
 		avgDiffQr := int64(math.Abs(float64(curRes.AvgQr) - float64(lastRes.AvgQr)))
 		if avgDiffQr > int64(lastRes.StdDevQr) {
-			negativeCheck(warnPre + task + warnMid + "Average (quartile reduced)")
+			//negativeCheck(warnPre + task + warnMid + "Average (quartile reduced)")
 			idl.Warn(warnPre+task+warnMid+"Average (quartile reduced)", time.Duration(avgDiffQr), lastRes, curRes)
 		}
 
 		stdDevQrDiff := int64(math.Abs(float64(curRes.StdDevQr) - float64(lastRes.StdDevQr)))
 		if stdDevQrDiff > int64(lastRes.StdDevQr) {
-			negativeCheck(warnPre + task + warnMid + "StandardDeviation (quartile reduced)")
+			//negativeCheck(warnPre + task + warnMid + "StandardDeviation (quartile reduced)")
 			idl.Warn(warnPre+task+warnMid+"StandardDeviation (quartile reduced)", time.Duration(stdDevQrDiff), lastRes, curRes)
 		}
 
 		invAvgDiff := int64(math.Abs(float64(curRes.IntervalAvg) - float64(lastRes.IntervalAvg)))
 		if invAvgDiff > int64(lastRes.IntervalStdDev) {
-			negativeCheck(warnPre + task + warnMid + "IntervalAverage")
+			//negativeCheck(warnPre + task + warnMid + "IntervalAverage")
 			idl.Warn(warnPre+task+warnMid+"IntervalAverage", time.Duration(invAvgDiff), lastRes, curRes)
 		}
 
 		invStdDevDiff := int64(math.Abs(float64(curRes.IntervalStdDev) - float64(lastRes.IntervalStdDev)))
 		if invStdDevDiff > int64(lastRes.IntervalStdDev) {
-			negativeCheck(warnPre + task + warnMid + "IntervalStandardDeviation")
+			//negativeCheck(warnPre + task + warnMid + "IntervalStandardDeviation")
 			idl.Warn(warnPre+task+warnMid+"IntervalStandardDeviation", time.Duration(invStdDevDiff), lastRes, curRes)
 		}
 	}
@@ -88,6 +88,7 @@ func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 	end, err := persistence.GetEndByStart(begin)
 	if err == persistence.NXlogpoint {
 		idl.Warn(`Task "`+begin.Task+`" not finished`, begin)
+		negativeCheck(`Task "` + begin.Task + `" not finished`)
 		return nil
 	}
 
@@ -98,9 +99,8 @@ func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 
 	if end.State != state.OK {
 		idl.Warn(`Task "`+begin.Task+`" unsuccessful`, end)
+		negativeCheck(`Task "` + begin.Task + `" unsuccessful`)
 	}
-
-	idl.Debug("task successfully checked", end)
 
 	return nil
 

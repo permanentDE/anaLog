@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	idl "go.iondynamics.net/iDlogger"
@@ -40,16 +42,7 @@ func Run() {
 	idl.StandardLogger().Async = true
 	idl.SetPrefix("anaLog")
 	idl.SetErrCallback(func(err error) {
-		idl.StandardLogger().Async = true
-		idl.Log(&idl.Event{
-			idl.StandardLogger(),
-			map[string]interface{}{
-				"error": err,
-			},
-			time.Now(),
-			priority.Emergency,
-			"AppLogger caught an internal error",
-		})
+		fmt.Fprintln(os.Stderr, err)
 		panic("AppLogger caught an internal error")
 	})
 

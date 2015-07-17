@@ -61,13 +61,13 @@ func RecurringTaskIncoming(begin logpoint.LogPoint) {
 		return
 	}
 	if err != nil {
-		idl.Crit("Failed scheduling for analysis of recurring task", err, begin)
+		idl.Crit("Failed scheduling for analysis of recurring task ", err, begin)
 	}
 
 	<-time.After(dur)
 	err = analysis.CheckRecurredTaskEnd(begin)
 	if err != nil {
-		idl.Crit("Failed analysis of recurring task", err, begin)
+		idl.Crit("Failed analysis of recurring task ", err, begin)
 	}
 }
 
@@ -75,12 +75,11 @@ func RecurringBeginWatcher() {
 	rc := analysis.NewResultContainer()
 	err := rc.LoadLatest()
 	if err != nil {
-		idl.Crit("Failed scheduling of task begin analysis", err)
+		idl.Crit("Failed scheduling of task begin analysis ", err)
 	}
 
 	analyzer := func(t string, r analysis.Result) {
 		go func(task string, res analysis.Result) {
-
 			for {
 				analysis.CheckRecurredTaskBegin(task)
 				<-time.After(res.IntervalAvg + res.IntervalStdDev)
