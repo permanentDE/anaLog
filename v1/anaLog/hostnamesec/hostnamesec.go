@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 
-	idl "go.iondynamics.net/iDlogger"
-
 	"go.permanent.de/anaLog/v1/config"
 )
 
@@ -31,8 +29,6 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 		}
 	}
 
-	idl.Debug(ownDomain)
-
 	var remoteAddr string
 
 	remoteAddr, _, err = net.SplitHostPort(remoteAddrPort)
@@ -50,7 +46,6 @@ func GetValidHost(remoteAddrPort string) (string, error) {
 		if remoteDomain == ownDomain {
 			return name, nil
 		}
-		idl.Debug(remoteDomain)
 	}
 
 	return "", errors.New("invalid request")

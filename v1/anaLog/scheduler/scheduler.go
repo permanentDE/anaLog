@@ -28,7 +28,7 @@ func Start() {
 
 	c := time.Tick(dur)
 	go loop(c)
-	go RecurringBeginWatcher()
+	//go RecurringBeginWatcher()
 }
 
 func StartIn(dur time.Duration) {
@@ -69,23 +69,4 @@ func RecurringTaskIncoming(begin logpoint.LogPoint) {
 	if err != nil {
 		idl.Crit("Failed analysis of recurring task ", err, begin)
 	}
-}
-
-func RecurringBeginWatcher() {
-	rc := analysis.NewResultContainer()
-	err := rc.LoadLatest()
-	if err != nil {
-		idl.Crit("Failed scheduling of task begin analysis ", err)
-	}
-
-	analyzer := func(t string, r analysis.Result) {
-		go func(task string, res analysis.Result) {
-			for {
-				analysis.CheckRecurredTaskBegin(task)
-				<-time.After(res.IntervalAvg + res.IntervalStdDev)
-			}
-		}(t, r)
-	}
-
-	rc.Range(analyzer)
 }

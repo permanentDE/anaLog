@@ -22,11 +22,9 @@ func Avg(durations []time.Duration) time.Duration {
 }
 
 func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
-	if len(durations) < 1 {
+	if len(durations) < 2 {
 		return 0
 	}
-
-	var diffSqSum float64
 
 	fullAvg := Avg(durations)
 
@@ -46,21 +44,20 @@ func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
 		default:
 			precision = time.Nanosecond
 		}
-		idl.Debug(precision)
 	}
 
 	avg := reducePrecision(fullAvg, precision)
-
+	var diffSqSum int64
 	for _, duration := range durations {
 		diff := reducePrecision(duration, precision) - avg
 		diffSq := diff * diff
 		diffSqSum = diffSqSum + diffSq
 	}
 
-	stdDeviationApproximation := math.Sqrt(diffSqSum / float64(len(durations)-1))
+	stdDeviationApproximation := int64(math.Sqrt(float64(diffSqSum / int64(len(durations)-1))))
 
 	if !(stdDeviationApproximation > -1) {
-		if len(durations) > 10 && diffSqSum > float64(5*time.Minute) {
+		if len(durations) > 5 {
 			idl.Crit("overflow detected - adjust standard deviation precision")
 		}
 		stdDeviationApproximation = 0
@@ -69,19 +66,8 @@ func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
 	return time.Duration(stdDeviationApproximation) * precision
 }
 
-func reducePrecision(dur time.Duration, unit time.Duration) float64 {
-	switch unit {
-	case time.Hour:
-		return dur.Hours()
-	case time.Minute:
-		return dur.Minutes()
-	case time.Second:
-		return dur.Seconds()
-	case time.Nanosecond:
-		return float64(dur.Nanoseconds())
-	default:
-		return float64(dur)
-	}
+func reducePrecision(dur time.Duration, unit time.Duration) int64 {
+	return (int64(dur) / int64(unit))
 }
 
 type ByTime []time.Time

@@ -45,7 +45,7 @@ func CheckRecurringFluctuation() error {
 		}
 
 		avgDiff := int64(math.Abs(float64(curRes.Avg) - float64(lastRes.Avg)))
-		if avgDiff > int64(lastRes.StdDevQr) {
+		if (avgDiff > int64(time.Second)) && (avgDiff > int64(lastRes.StdDevQr)) {
 			//negativeCheck(warnPre + task + warnMid + "Average")
 			idl.Warn(warnPre+task+warnMid+"Average", time.Duration(avgDiff), lastRes, curRes)
 		}
@@ -69,7 +69,7 @@ func CheckRecurringFluctuation() error {
 		}
 
 		invAvgDiff := int64(math.Abs(float64(curRes.IntervalAvg) - float64(lastRes.IntervalAvg)))
-		if invAvgDiff > int64(lastRes.IntervalStdDev) {
+		if (invAvgDiff > int64(time.Second)) && (invAvgDiff > int64(lastRes.IntervalStdDev)) {
 			//negativeCheck(warnPre + task + warnMid + "IntervalAverage")
 			idl.Warn(warnPre+task+warnMid+"IntervalAverage", time.Duration(invAvgDiff), lastRes, curRes)
 		}
