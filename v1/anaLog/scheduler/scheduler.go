@@ -11,6 +11,7 @@ import (
 )
 
 var registeredChannels []chan<- time.Time
+var GracePeriod time.Duration
 
 func Start() {
 	if config.AnaLog.SchedulerInterval == "" {
@@ -22,13 +23,19 @@ func Start() {
 		idl.Emerg("Invalid configuration: AnaLog.SchedulerInterval")
 	}
 
+	if config.AnaLog.GracePeriod != "" {
+		GracePeriod, err = time.ParseDuration(config.AnaLog.GracePeriod)
+		if err != nil {
+			idl.Emerg("Invalid configuration: AnaLog.GracePeriod")
+		}
+	}
+
 	go func() {
 		pingAll(time.Now())
 	}()
 
 	c := time.Tick(dur)
 	go loop(c)
-	//go RecurringBeginWatcher()
 }
 
 func StartIn(dur time.Duration) {
@@ -64,7 +71,7 @@ func RecurringTaskIncoming(begin logpoint.LogPoint) {
 		idl.Crit("Failed scheduling for analysis of recurring task ", err, begin)
 	}
 
-	<-time.After(dur)
+	<-time.After(dur + GracePeriod)
 	err = analysis.CheckRecurredTaskEnd(begin)
 	if err != nil {
 		idl.Crit("Failed analysis of recurring task ", err, begin)

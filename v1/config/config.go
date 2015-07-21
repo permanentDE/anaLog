@@ -53,6 +53,7 @@ type AnaLogCfg struct {
 	UseInflux         bool
 	UseMongo          bool
 	SchedulerInterval string
+	GracePeriod       string
 	Listen            string
 	Fcgi              bool
 	UseSocketMaster   bool
