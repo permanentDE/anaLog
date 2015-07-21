@@ -73,16 +73,6 @@ func PushRecurringEnd(w http.ResponseWriter, req *http.Request) *webapp.Error {
 	return nil
 }
 
-func AnalyzeRecurring(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	_, err := hostnamesec.GetValidHost(req.RemoteAddr)
-	if err != nil {
-		idl.Emerg(err)
-	}
-	ta, err := anaLog.AnalyzeRecurring()
-	fmt.Fprintln(w, ta, err)
-	return nil
-}
-
 func NagiosStatus(w http.ResponseWriter, req *http.Request) *webapp.Error {
 	fmt.Fprintln(w, nagios.Status())
 	return nil

@@ -2,7 +2,7 @@
 ; UseInflux
 UseMongo
 SchedulerInterval = 10s
-Worker = 3
+GracePeriod = 10s
 Workspace = ./
 CookieSecret = secret
 NagiosSecret = secret
@@ -10,25 +10,25 @@ Listen = :3001
 ; Fcgi
 ; UseSocketMaster
 DevelopmentEnv
-; Domain = permanent.de
+; Domain = example.org
 
 [Influx]
-Host = localhost
-Port = 8086
-Database = anaLog
-User = root
-Pass = root
-
-[Mongo]
-Host = localhost
-; Port = 1234
+; Host = localhost
+; Port = 8086
 ; Database = anaLog
 ; User = root
 ; Pass = root
 
+[Mongo]
+Host = example.org
+; Port = 1234
+Database = anaLog
+; User = root
+; Pass = root
+
 [SocketMaster]
-Port = 3001
-; DomainSuffix = analog.permanent.dev:3000
+; Port = 3001
+; DomainSuffix = example.org
 ; PathPrefix = /a
 ; Cert ; PEM encoded string
 ; Key ; PEM encoded string
