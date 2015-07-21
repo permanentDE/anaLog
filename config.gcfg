@@ -6,10 +6,11 @@ GracePeriod = 10s
 Workspace = ./
 CookieSecret = secret
 NagiosSecret = secret
+OverrideSecret = secret
 Listen = :3001
 ; Fcgi
 ; UseSocketMaster
-DevelopmentEnv
+; DevelopmentEnv
 ; Domain = example.org
 
 [Influx]

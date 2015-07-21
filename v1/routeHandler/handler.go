@@ -21,8 +21,24 @@ func NotFound(w http.ResponseWriter, req *http.Request) *webapp.Error {
 	return webapp.Write(errors.New("404 - Not found"), "404 - This isn't the page you're looking for", http.StatusNotFound)
 }
 
+func auth(w http.ResponseWriter, req *http.Request) (host string, err error) {
+	secret := req.FormValue("override-secret")
+	if secret == "" {
+		host, err = hostnamesec.GetValidHost(req.RemoteAddr)
+		return
+	} else if secret != config.AnaLog.OverrideSecret {
+		err = errors.New("Invalid Secret")
+		return
+	}
+
+	host = req.FormValue("override-host")
+
+	return
+
+}
+
 func PushRecurringBegin(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	host, err := hostnamesec.GetValidHost(req.RemoteAddr)
+	host, err := auth(w, req)
 	if err != nil {
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return nil
@@ -45,7 +61,7 @@ func PushRecurringBegin(w http.ResponseWriter, req *http.Request) *webapp.Error 
 }
 
 func PushRecurringEnd(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	host, err := hostnamesec.GetValidHost(req.RemoteAddr)
+	host, err := auth(w, req)
 	if err != nil {
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return nil
