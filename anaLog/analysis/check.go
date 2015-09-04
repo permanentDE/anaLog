@@ -50,11 +50,11 @@ func CheckRecurringFluctuation() error {
 			idl.Warn(warnPre+task+warnMid+"Average", time.Duration(avgDiff), lastRes, curRes)
 		}
 
-		stdDevDiff := int64(math.Abs(float64(curRes.StdDev) - float64(lastRes.StdDev)))
+		/*stdDevDiff := int64(math.Abs(float64(curRes.StdDev) - float64(lastRes.StdDev)))
 		if stdDevDiff > int64(lastRes.StdDevQr) {
 			//negativeCheck(warnPre + task + warnMid + "StandardDeviation")
 			idl.Warn(warnPre+task+warnMid+"StandardDeviation", time.Duration(stdDevDiff), lastRes, curRes)
-		}
+		}*/
 
 		avgDiffQr := int64(math.Abs(float64(curRes.AvgQr) - float64(lastRes.AvgQr)))
 		if avgDiffQr > int64(lastRes.StdDevQr) {
@@ -62,11 +62,11 @@ func CheckRecurringFluctuation() error {
 			idl.Warn(warnPre+task+warnMid+"Average (quartile reduced)", time.Duration(avgDiffQr), lastRes, curRes)
 		}
 
-		stdDevQrDiff := int64(math.Abs(float64(curRes.StdDevQr) - float64(lastRes.StdDevQr)))
+		/*stdDevQrDiff := int64(math.Abs(float64(curRes.StdDevQr) - float64(lastRes.StdDevQr)))
 		if stdDevQrDiff > int64(lastRes.StdDevQr) {
 			//negativeCheck(warnPre + task + warnMid + "StandardDeviation (quartile reduced)")
 			idl.Warn(warnPre+task+warnMid+"StandardDeviation (quartile reduced)", time.Duration(stdDevQrDiff), lastRes, curRes)
-		}
+		}*/
 
 		invAvgDiff := int64(math.Abs(float64(curRes.IntervalAvg) - float64(lastRes.IntervalAvg)))
 		if (invAvgDiff > int64(time.Second)) && (invAvgDiff > int64(lastRes.IntervalStdDev)) {
@@ -74,11 +74,11 @@ func CheckRecurringFluctuation() error {
 			idl.Warn(warnPre+task+warnMid+"IntervalAverage", time.Duration(invAvgDiff), lastRes, curRes)
 		}
 
-		invStdDevDiff := int64(math.Abs(float64(curRes.IntervalStdDev) - float64(lastRes.IntervalStdDev)))
+		/*invStdDevDiff := int64(math.Abs(float64(curRes.IntervalStdDev) - float64(lastRes.IntervalStdDev)))
 		if invStdDevDiff > int64(lastRes.IntervalStdDev) {
 			//negativeCheck(warnPre + task + warnMid + "IntervalStandardDeviation")
 			idl.Warn(warnPre+task+warnMid+"IntervalStandardDeviation", time.Duration(invStdDevDiff), lastRes, curRes)
-		}
+		}*/
 	}
 
 	return err
