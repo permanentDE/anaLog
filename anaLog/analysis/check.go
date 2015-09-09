@@ -87,7 +87,7 @@ func CheckRecurringFluctuation() error {
 func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 	end, err := persistence.GetEndByStart(begin)
 	if err == persistence.NXlogpoint {
-		idl.Warn(`Task "`+begin.Task+`" not finished`, begin)
+		idl.Err(`Task "`+begin.Task+`" not finished`, begin)
 		negativeCheck(`Task "` + begin.Task + `" not finished`)
 		return nil
 	}
@@ -98,12 +98,11 @@ func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 	}
 
 	if end.State != state.OK {
-		idl.Warn(`Task "`+begin.Task+`" unsuccessful`, end)
+		idl.Err(`Task "`+begin.Task+`" unsuccessful`, end)
 		negativeCheck(`Task "` + begin.Task + `" unsuccessful`)
 	}
 
 	return nil
-
 }
 
 func CheckRecurredTaskBegin(name string) error {
@@ -130,7 +129,7 @@ func CheckRecurredTaskBegin(name string) error {
 
 	if time.Now().Sub(lastBegin.Time) > (res.IntervalAvg + res.IntervalStdDev) {
 		msg := `Task "` + name + `" has not recurred in time`
-		idl.Warn(msg, lastBegin)
+		idl.Err(msg, lastBegin)
 		negativeCheck(msg)
 	}
 

@@ -73,7 +73,7 @@ func RecurringTaskIncoming(begin logpoint.LogPoint) {
 	}
 
 	<-time.After(dur + GracePeriod)
-	<-heartbeat.StillAlive(begin.Task, begin.RunId)
+	heartbeat.Wait(heartbeat.Heartbeat{LogPoint: begin})
 	err = analysis.CheckRecurredTaskEnd(begin)
 	if err != nil {
 		idl.Crit("Failed analysis of recurring task ", err, begin)

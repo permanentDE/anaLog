@@ -35,6 +35,7 @@ func PushRecurringBegin(task, host string) (string, error) {
 		Time:     time.Now(),
 	}
 	go scheduler.RecurringTaskIncoming(lp)
+	heartbeat.Create(heartbeat.Heartbeat{lp, "heartbeat"})
 	return lp.RunId, persistence.StorePoint(lp)
 }
 
@@ -50,9 +51,9 @@ func PushRecurringEnd(task, host, identifier, stateStr, requestBody string) erro
 		Raw:      requestBody,
 	}
 	if lp.State != state.OK {
-		idl.Warn("Recurring task unsuccessful: "+lp.Task, lp)
+		idl.Err("Recurring task unsuccessful: "+lp.Task, lp)
 	}
-	heartbeat.Die(task, identifier)
+	heartbeat.Exit(heartbeat.Heartbeat{lp, "exit"})
 	return persistence.StorePoint(lp)
 }
 
@@ -69,7 +70,6 @@ func PushRecurringHeartbeat(host, task, identifier, subtask string) error {
 		},
 		Subtask: subtask,
 	}
-	//fmt.Println(task, identifier, subtask)
-	heartbeat.Notice(hb)
+	heartbeat.Ping(hb)
 	return nil
 }

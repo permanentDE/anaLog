@@ -34,7 +34,6 @@ func auth(w http.ResponseWriter, req *http.Request) (host string, err error) {
 	host = req.FormValue("override-host")
 
 	return
-
 }
 
 func PushRecurringBegin(w http.ResponseWriter, req *http.Request) *webapp.Error {

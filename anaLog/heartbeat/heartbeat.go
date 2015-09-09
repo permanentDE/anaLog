@@ -1,6 +1,8 @@
 package heartbeat
 
 import (
+	"go.iondynamics.net/iDhelper/randGen"
+
 	"go.permanent.de/anaLog/anaLog/logpoint"
 )
 
@@ -9,20 +11,25 @@ type Heartbeat struct {
 	Subtask string
 }
 
-func Notice(hb Heartbeat) {
-	//hb.Task
-	//hb.RunId
+func (hb Heartbeat) UID() string {
+	return hb.LogPoint.Task + "_" + hb.LogPoint.RunId + "_" + hb.Subtask + "_" + randGen.String(16)
 }
 
-func StillAlive(task, runid string) <-chan bool {
-	ch := make(chan bool)
-	go func(c chan bool) {
-		//do stuff
-		c <- false //debug
-	}(ch)
-	return ch
+var reg = NewRegistry()
+
+func Create(hb Heartbeat) {
+	reg.Create(hb)
 }
 
-func Die(task, runid string) {
+func Ping(hb Heartbeat) {
+	reg.Ping(hb)
+}
 
+func Wait(hb Heartbeat) {
+	<-reg.GetCh(hb)
+	reg.Clear(hb)
+}
+
+func Exit(hb Heartbeat) {
+	reg.Clear(hb)
 }

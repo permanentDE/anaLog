@@ -39,7 +39,7 @@ func recurringBeginWatcher(ch chan time.Time) {
 		rc := analysis.NewResultContainer()
 		err := rc.LoadLatest()
 		if err != nil {
-			idl.Crit("Failed scheduling of task begin analysis ", err)
+			idl.Crit("Failed scheduling of task begin analysis: ", err)
 		}
 
 		rc.Range(createAnalyzer(time.Now().Add(schedulerInterval)))
