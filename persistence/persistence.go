@@ -2,12 +2,14 @@ package persistence
 
 import (
 	"errors"
+	"sort"
+	"time"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
-	"go.permanent.de/anaLog/anaLog/persistence/influx"
-	"go.permanent.de/anaLog/anaLog/persistence/mongo"
-	"go.permanent.de/anaLog/anaLog/state"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/logpoint"
+	"go.permanent.de/anaLog/persistence/influx"
+	"go.permanent.de/anaLog/persistence/mongo"
+	"go.permanent.de/anaLog/state"
 )
 
 func Close() {
@@ -23,8 +25,6 @@ var (
 )
 
 type Adapter interface {
-	/*	GetPoint(string) (logpoint.LogPoint, error)
-		UpsertPoint(logpoint.LogPoint) error*/
 	StorePoint(logpoint.LogPoint) error
 	StorePoints(...logpoint.LogPoint) error
 	GetRecurring() (map[string]map[string]map[string]logpoint.LogPoint, error)
@@ -32,7 +32,8 @@ type Adapter interface {
 	GetLatestAnalysisRCserial() ([]byte, error)
 	GetEndByStart(logpoint.LogPoint) (logpoint.LogPoint, error)
 	GetLastBegin(string) (logpoint.LogPoint, error)
-	Close()
+	Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error)
+	Close() error
 }
 
 func getAdapter() Adapter {
@@ -81,11 +82,11 @@ func GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	return getAdapter().GetLastBegin(taskname)
 }
 
-/*func GetPoint(identifier string) (logpoint.LogPoint, error) {
-	return getAdapter().GetPoint(identifier)
+func Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+	lps, err := getAdapter().Find(task, host, state, rawRegex, timeRangeGTE, timeRangeLTE, n)
+	if err != nil {
+		return nil, err
+	}
+	sort.Sort(logpoint.ByTime(lps))
+	return lps, err
 }
-
-func UpsertPoint(lp logpoint.LogPoint) error {
-	return getAdapter().UpsertPoint(lp)
-}
-*/

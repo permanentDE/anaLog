@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"go.permanent.de/anaLog/anaLog/analysis"
+	"go.permanent.de/anaLog/analysis"
 )
 
 type Registry struct {

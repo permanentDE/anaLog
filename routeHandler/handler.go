@@ -1,19 +1,16 @@
 package routeHandler
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/webapp"
 
-	"go.permanent.de/anaLog/anaLog"
-	"go.permanent.de/anaLog/anaLog/hostnamesec"
-	"go.permanent.de/anaLog/anaLog/nagios"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/hostnamesec"
+	"go.permanent.de/anaLog/nagios"
 )
 
 func NotFound(w http.ResponseWriter, req *http.Request) *webapp.Error {
@@ -36,84 +33,6 @@ func auth(w http.ResponseWriter, req *http.Request) (host string, err error) {
 	return
 }
 
-func PushRecurringBegin(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	host, err := auth(w, req)
-	if err != nil {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return nil
-	}
-
-	vars := mux.Vars(req)
-	task, ok := vars["task"]
-	if !ok {
-		return webapp.Write(errors.New("Invalid request: no task"), "no task given", http.StatusBadRequest)
-	}
-
-	identifier, err := anaLog.PushRecurringBegin(task, host)
-	if err != nil {
-		return webapp.Write(err, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprint(w, identifier)
-	return nil
-}
-
-func PushRecurringHeartbeat(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	host, err := auth(w, req)
-	if err != nil {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return nil
-	}
-
-	vars := mux.Vars(req)
-	task, tOk := vars["task"]
-	identifier, iOk := vars["identifier"]
-	subtask, sOk := vars["subtask"]
-	if !tOk || !iOk {
-		return webapp.Write(errors.New("Invalid request"), "invalid request", http.StatusBadRequest)
-	}
-	if !sOk {
-		subtask = "heartbeat"
-	}
-
-	err = anaLog.PushRecurringHeartbeat(host, task, identifier, subtask)
-	if err != nil {
-		return webapp.Write(err, "Internal server error", http.StatusInternalServerError)
-	}
-	w.WriteHeader(http.StatusCreated)
-	return nil
-}
-
-func PushRecurringEnd(w http.ResponseWriter, req *http.Request) *webapp.Error {
-	host, err := auth(w, req)
-	if err != nil {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return nil
-	}
-
-	vars := mux.Vars(req)
-	task, tOk := vars["task"]
-	identifier, iOk := vars["identifier"]
-	state, sOk := vars["state"]
-	if !tOk || !iOk || !sOk {
-		return webapp.Write(errors.New("Invalid request"), "invalid request", http.StatusBadRequest)
-	}
-
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(req.Body)
-	defer req.Body.Close()
-	body := buf.String()
-
-	err = anaLog.PushRecurringEnd(task, host, identifier, state, body)
-	if err != nil {
-		return webapp.Write(err, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.WriteHeader(http.StatusAccepted)
-	return nil
-}
-
 func NagiosStatus(w http.ResponseWriter, req *http.Request) *webapp.Error {
 	fmt.Fprintln(w, nagios.Status())
 	return nil
@@ -125,9 +44,9 @@ func NagiosReset(w http.ResponseWriter, req *http.Request) *webapp.Error {
 		return nil
 	}
 
-	ns := req.FormValue("nagios-secret")
-	if ns != "" {
-		if ns != config.AnaLog.NagiosSecret {
+	as := req.FormValue("admin-secret")
+	if as != "" {
+		if as != config.AnaLog.AdminSecret {
 			http.Error(w, "Invalid secret", http.StatusUnauthorized)
 			return nil
 		} else {
@@ -142,7 +61,7 @@ func NagiosReset(w http.ResponseWriter, req *http.Request) *webapp.Error {
 		<html>
 			<body>
 				<form method="POST">
-					<input type="text" name="nagios-secret">
+					<input type="text" name="admin-secret">
 					<input type="submit">
 				</form>
 			</body>

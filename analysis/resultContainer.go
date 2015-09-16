@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"go.permanent.de/anaLog/anaLog/persistence"
+	"go.permanent.de/anaLog/persistence"
 )
 
 type Result struct {

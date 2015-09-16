@@ -2,14 +2,15 @@ package mongo
 
 import (
 	"fmt"
+	"time"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
-	"go.permanent.de/anaLog/anaLog/mode"
-	"go.permanent.de/anaLog/anaLog/state"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/logpoint"
+	"go.permanent.de/anaLog/mode"
+	"go.permanent.de/anaLog/state"
 )
 
 type Adapter struct {
@@ -20,8 +21,9 @@ func GetAdapter() *Adapter {
 	return &Adapter{session: getMgoSession()}
 }
 
-func (a *Adapter) Close() {
+func (a *Adapter) Close() error {
 	a.session.Close()
+	return nil
 }
 
 func (a *Adapter) StorePoint(lp logpoint.LogPoint) error {
@@ -139,4 +141,45 @@ func (a *Adapter) GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	c := a.session.DB(config.Mongo.Database).C("logpoints")
 	err = c.Find(bson.M{"task": taskname}).Sort("-time").One(&lp)
 	return lp, err
+}
+
+func (a *Adapter) Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+	err := a.session.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	lps := []logpoint.LogPoint{}
+	c := a.session.DB(config.Mongo.Database).C("logpoints")
+	m := bson.M{}
+
+	if task != "" {
+		m["task"] = task
+	}
+
+	if host != "" {
+		m["host"] = host
+	}
+
+	if state != "" {
+		m["state"] = state
+	}
+
+	if rawRegex != "" {
+		m["raw"] = bson.RegEx{
+			Pattern: rawRegex,
+			Options: "i",
+		}
+	}
+
+	if timeRangeGTE.IsZero() == false || timeRangeLTE.IsZero() == false {
+		if timeRangeLTE.IsZero() {
+			timeRangeLTE = time.Now()
+		}
+
+		m["time"] = bson.M{"$gte": timeRangeGTE, "$lte": timeRangeLTE}
+	}
+
+	err = c.Find(m).Sort("-time").Limit(int(n)).All(&lps)
+	return lps, err
 }

@@ -3,7 +3,7 @@ package heartbeat
 import (
 	"go.iondynamics.net/iDhelper/randGen"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
+	"go.permanent.de/anaLog/logpoint"
 )
 
 type Heartbeat struct {

@@ -1,4 +1,4 @@
-package anaLog
+package api
 
 import (
 	"strconv"
@@ -8,12 +8,12 @@ import (
 	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/iDlogger/priority"
 
-	"go.permanent.de/anaLog/anaLog/heartbeat"
-	"go.permanent.de/anaLog/anaLog/logpoint"
-	"go.permanent.de/anaLog/anaLog/mode"
-	"go.permanent.de/anaLog/anaLog/persistence"
-	"go.permanent.de/anaLog/anaLog/scheduler"
-	"go.permanent.de/anaLog/anaLog/state"
+	"go.permanent.de/anaLog/heartbeat"
+	"go.permanent.de/anaLog/logpoint"
+	"go.permanent.de/anaLog/mode"
+	"go.permanent.de/anaLog/persistence"
+	"go.permanent.de/anaLog/scheduler"
+	"go.permanent.de/anaLog/state"
 )
 
 func newRunId() string {
@@ -24,7 +24,7 @@ func Close() {
 	persistence.Close()
 }
 
-func PushRecurringBegin(task, host string) (string, error) {
+func PushRecurringBegin(task, host string, data map[string]interface{}) (string, error) {
 	lp := logpoint.LogPoint{
 		RunId:    newRunId(),
 		Task:     task,
@@ -33,13 +33,14 @@ func PushRecurringBegin(task, host string) (string, error) {
 		Priority: priority.Informational,
 		State:    state.Started,
 		Time:     time.Now(),
+		Data:     data,
 	}
 	go scheduler.RecurringTaskIncoming(lp)
 	heartbeat.Create(heartbeat.Heartbeat{lp, "heartbeat"})
 	return lp.RunId, persistence.StorePoint(lp)
 }
 
-func PushRecurringEnd(task, host, identifier, stateStr, requestBody string) error {
+func PushRecurringEnd(task, host, identifier, stateStr, requestBody string, data map[string]interface{}) error {
 	lp := logpoint.LogPoint{
 		RunId:    identifier,
 		Task:     task,
@@ -49,6 +50,7 @@ func PushRecurringEnd(task, host, identifier, stateStr, requestBody string) erro
 		State:    state.Atos(stateStr),
 		Time:     time.Now(),
 		Raw:      requestBody,
+		Data:     data,
 	}
 	if lp.State != state.OK {
 		idl.Err("Recurring task unsuccessful: "+lp.Task, lp)

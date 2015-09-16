@@ -5,14 +5,14 @@ import (
 
 	idl "go.iondynamics.net/iDlogger"
 
-	"go.permanent.de/anaLog/anaLog/analysis"
-	"go.permanent.de/anaLog/anaLog/heartbeat"
-	"go.permanent.de/anaLog/anaLog/logpoint"
+	"go.permanent.de/anaLog/analysis"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/heartbeat"
+	"go.permanent.de/anaLog/logpoint"
 )
 
 var registeredChannels []chan<- time.Time
-var GracePeriod time.Duration
+var gracePeriod time.Duration
 
 func Start() {
 	if config.AnaLog.SchedulerInterval == "" {
@@ -25,7 +25,7 @@ func Start() {
 	}
 
 	if config.AnaLog.GracePeriod != "" {
-		GracePeriod, err = time.ParseDuration(config.AnaLog.GracePeriod)
+		gracePeriod, err = time.ParseDuration(config.AnaLog.GracePeriod)
 		if err != nil {
 			idl.Emerg("Invalid configuration: AnaLog.GracePeriod")
 		}
@@ -72,7 +72,7 @@ func RecurringTaskIncoming(begin logpoint.LogPoint) {
 		idl.Crit("Failed scheduling for analysis of recurring task ", err, begin)
 	}
 
-	<-time.After(dur + GracePeriod)
+	<-time.After(dur + gracePeriod)
 	heartbeat.Wait(heartbeat.Heartbeat{LogPoint: begin})
 	err = analysis.CheckRecurredTaskEnd(begin)
 	if err != nil {

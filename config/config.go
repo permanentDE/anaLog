@@ -59,7 +59,7 @@ type AnaLogCfg struct {
 	UseSocketMaster   bool
 	Workspace         string
 	CookieSecret      string
-	NagiosSecret      string
+	AdminSecret       string
 	OverrideSecret    string
 	Domain            string
 	DevelopmentEnv    bool

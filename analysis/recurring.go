@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
-	"go.permanent.de/anaLog/anaLog/persistence"
-	"go.permanent.de/anaLog/anaLog/state"
+	"go.permanent.de/anaLog/logpoint"
+	"go.permanent.de/anaLog/persistence"
+	"go.permanent.de/anaLog/state"
 )
 
 var (

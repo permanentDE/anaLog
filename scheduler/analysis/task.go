@@ -1,13 +1,13 @@
-package defaultTask
+package analysis
 
 import (
 	"time"
 
 	idl "go.iondynamics.net/iDlogger"
 
-	"go.permanent.de/anaLog/anaLog/analysis"
-	"go.permanent.de/anaLog/anaLog/scheduler"
+	"go.permanent.de/anaLog/analysis"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/scheduler"
 )
 
 func init() {
@@ -43,7 +43,6 @@ func recurringBeginWatcher(ch chan time.Time) {
 		}
 
 		rc.Range(createAnalyzer(time.Now().Add(schedulerInterval)))
-
 	}
 }
 

@@ -1,11 +1,12 @@
 package router
 
 import (
-	"github.com/gorilla/mux"
-	//idl "go.iondynamics.net/iDlogger"
-	"go.iondynamics.net/webapp"
-	handler "go.permanent.de/anaLog/routeHandler"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"go.iondynamics.net/webapp"
+
+	handler "go.permanent.de/anaLog/routeHandler"
 )
 
 func New() *mux.Router {
@@ -30,6 +31,10 @@ func provision(r *mux.Router) *mux.Router {
 	v1Nagios := v1.PathPrefix("/nagios").Subrouter()
 	v1Nagios.Handle("/status", webapp.Handler(handler.NagiosStatus)).Methods("GET")
 	v1Nagios.Handle("/reset", webapp.Handler(handler.NagiosReset)).Methods("GET", "POST")
+
+	v1Read := v1.PathPrefix("/read").Methods("GET", "POST").Subrouter()
+	v1Read.Handle("/find/{number}", webapp.Handler(handler.ReadFind))
+	v1Read.Handle("/find", webapp.Handler(handler.ReadFind))
 
 	return r
 }

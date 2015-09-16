@@ -5,7 +5,6 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"go.permanent.de/anaLog/config"
-	//"gopkg.in/mgo.v2/bson"
 )
 
 var mgoSession *mgo.Session
@@ -33,8 +32,4 @@ func getMgoSession() *mgo.Session {
 		connect2mgo()
 	}
 	return mgoSession
-}
-
-func Close() {
-	mgoSession.Close()
 }

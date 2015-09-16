@@ -6,10 +6,10 @@ import (
 
 	idl "go.iondynamics.net/iDlogger"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
-	"go.permanent.de/anaLog/anaLog/nagios"
-	"go.permanent.de/anaLog/anaLog/persistence"
-	"go.permanent.de/anaLog/anaLog/state"
+	"go.permanent.de/anaLog/logpoint"
+	"go.permanent.de/anaLog/nagios"
+	"go.permanent.de/anaLog/persistence"
+	"go.permanent.de/anaLog/state"
 )
 
 func CheckRecurringFluctuation() error {

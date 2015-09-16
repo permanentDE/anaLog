@@ -9,16 +9,16 @@ import (
 	"go.iondynamics.net/iDlogger/priority"
 	"go.iondynamics.net/iDslackLog"
 
-	"go.permanent.de/anaLog/anaLog"
-	"go.permanent.de/anaLog/anaLog/scheduler"
-	_ "go.permanent.de/anaLog/anaLog/scheduler/defaultTask"
+	"go.permanent.de/anaLog/api"
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/scheduler"
+	_ "go.permanent.de/anaLog/scheduler/analysis"
 	"go.permanent.de/anaLog/server"
 )
 
 func main() {
 	defer func() {
-		anaLog.Close()
+		api.Close()
 		idl.Panic("shutdown")
 	}()
 

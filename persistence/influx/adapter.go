@@ -3,10 +3,11 @@ package influx
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/influxdb/influxdb/client"
 
-	"go.permanent.de/anaLog/anaLog/logpoint"
+	"go.permanent.de/anaLog/logpoint"
 )
 
 type Adapter struct {
@@ -17,8 +18,9 @@ func GetAdapter() *Adapter {
 	return &Adapter{client: connect2influx()}
 }
 
-func (a *Adapter) Close() {
+func (a *Adapter) Close() error {
 	//influx http api client doesn't have to be closed
+	return nil
 }
 
 func (a *Adapter) queryDB(cmd string) (res []client.Result, err error) {
@@ -163,4 +165,8 @@ func (a *Adapter) GetEndByStart(begin logpoint.LogPoint) (logpoint.LogPoint, err
 
 func (a *Adapter) GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	return logpoint.LogPoint{}, fmt.Errorf("%s", "not implemented")
+}
+
+func (a *Adapter) Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+	return nil, fmt.Errorf("%s", "not implemented")
 }
