@@ -10,9 +10,16 @@ import (
 	"go.iondynamics.net/webapp"
 
 	"go.permanent.de/anaLog/api"
+	"go.permanent.de/anaLog/config"
 )
 
 func ReadFind(w http.ResponseWriter, req *http.Request) *webapp.Error {
+	as := req.FormValue("admin-secret")
+	if as != config.AnaLog.AdminSecret {
+		http.Error(w, "Invalid secret", http.StatusUnauthorized)
+		return nil
+	}
+
 	nStr, ok := mux.Vars(req)["number"]
 	if !ok {
 		nStr = "1"
@@ -24,6 +31,7 @@ func ReadFind(w http.ResponseWriter, req *http.Request) *webapp.Error {
 	}
 
 	task := req.FormValue("task")
+	runId := req.FormValue("runId")
 	host := req.FormValue("host")
 	state := req.FormValue("state")
 	rawRegex := req.FormValue("rawRegex")
@@ -59,12 +67,39 @@ func ReadFind(w http.ResponseWriter, req *http.Request) *webapp.Error {
 		trLTE = time.Unix(int64(trLTEn), 0)
 	}
 
-	lps, err := api.Find(task, host, state, rawRegex, trGTE, trLTE, uint(n))
+	lps, err := api.Find(task, runId, host, state, rawRegex, trGTE, trLTE, uint(n))
 	if err != nil {
 		return webapp.Write(err, err.Error(), http.StatusInternalServerError)
 	}
 
 	return writeJson(w, lps)
+}
+
+func ReadResults(w http.ResponseWriter, req *http.Request) *webapp.Error {
+	return simpleRead(w, req, func() (interface{}, error) {
+		return api.Results()
+	})
+}
+
+func ReadProblems(w http.ResponseWriter, req *http.Request) *webapp.Error {
+	return simpleRead(w, req, func() (interface{}, error) {
+		return api.Problems(), nil
+	})
+}
+
+func simpleRead(w http.ResponseWriter, req *http.Request, fn func() (interface{}, error)) *webapp.Error {
+	as := req.FormValue("admin-secret")
+	if as != config.AnaLog.AdminSecret {
+		http.Error(w, "Invalid secret", http.StatusUnauthorized)
+		return nil
+	}
+
+	i, err := fn()
+	if err != nil {
+		return webapp.Write(err, err.Error(), http.StatusInternalServerError)
+	}
+
+	return writeJson(w, i)
 }
 
 func writeJson(w http.ResponseWriter, i interface{}) *webapp.Error {

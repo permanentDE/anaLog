@@ -6,12 +6,14 @@ import (
 
 	idl "go.iondynamics.net/iDlogger"
 
+	"go.permanent.de/anaLog/alertBlocker"
 	"go.permanent.de/anaLog/logpoint"
 	"go.permanent.de/anaLog/nagios"
 	"go.permanent.de/anaLog/persistence"
 	"go.permanent.de/anaLog/state"
 )
 
+//CheckRecurringFluctuation returns an error only if there is an internal error (e.g. loading data from persistence). Found fluctuations are logged via iDlogger.
 func CheckRecurringFluctuation() error {
 	lastRc := NewResultContainer()
 	err := lastRc.LoadLatest()
@@ -84,6 +86,7 @@ func CheckRecurringFluctuation() error {
 	return err
 }
 
+//CheckRecurredTaskEnd returns an error only if there is an internal error (e.g. loading data from persistence). Missing ends are logged via iDlogger and Nagios.
 func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 	end, err := persistence.GetEndByStart(begin)
 	if err == persistence.NXlogpoint {
@@ -105,6 +108,7 @@ func CheckRecurredTaskEnd(begin logpoint.LogPoint) error {
 	return nil
 }
 
+//CheckRecurredTaskBegin returns an error only if there is an internal error (e.g. loading data from persistence). Missing starts are logged via iDlogger and Nagios.
 func CheckRecurredTaskBegin(name string) error {
 	lastRc := NewResultContainer()
 	err := lastRc.LoadLatest()
@@ -127,10 +131,11 @@ func CheckRecurredTaskBegin(name string) error {
 		//no interval data
 	}
 
-	if time.Now().Sub(lastBegin.Time) > (res.IntervalAvg + res.IntervalStdDev) {
+	if time.Now().Sub(lastBegin.Time) > (res.IntervalAvg+res.IntervalStdDev) && alertBlocker.IsUnknown(name, "not recurred") {
 		msg := `Task "` + name + `" has not recurred in time`
 		idl.Err(msg, lastBegin)
 		negativeCheck(msg)
+		alertBlocker.Occurred(name, "not recurred")
 	}
 
 	return nil

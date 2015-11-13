@@ -5,6 +5,7 @@ import (
 
 	idl "go.iondynamics.net/iDlogger"
 
+	"go.permanent.de/anaLog/alertBlocker"
 	"go.permanent.de/anaLog/analysis"
 	"go.permanent.de/anaLog/config"
 	"go.permanent.de/anaLog/heartbeat"
@@ -64,6 +65,10 @@ func Register(channel chan<- time.Time) {
 
 func RecurringTaskIncoming(begin logpoint.LogPoint) {
 	dur, err := analysis.RecurringExpectedAfter(begin)
+	if !alertBlocker.IsUnknown(begin.Task, "not recurred") {
+		alertBlocker.Resolved(begin.Task, "not recurred")
+	}
+
 	if err == analysis.NoRecurringData {
 		idl.Notice(`Skipping analysis scheduling of recurring task "` + begin.Task + `" due to missing data`)
 		return

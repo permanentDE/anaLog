@@ -57,8 +57,6 @@ type AnaLogCfg struct {
 	Listen            string
 	Fcgi              bool
 	UseSocketMaster   bool
-	Workspace         string
-	CookieSecret      string
 	AdminSecret       string
 	OverrideSecret    string
 	Domain            string

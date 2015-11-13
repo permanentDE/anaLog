@@ -11,6 +11,7 @@ type Heartbeat struct {
 	Subtask string
 }
 
+//UID returns an unique identifier for the heartbeat
 func (hb Heartbeat) UID() string {
 	return hb.LogPoint.Task + "_" + hb.LogPoint.RunId + "_" + hb.Subtask + "_" + randGen.String(16)
 }

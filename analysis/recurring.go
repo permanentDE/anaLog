@@ -14,13 +14,14 @@ var (
 	NoRecurringData error = errors.New("No recurring data (yet)")
 )
 
+//GetRecurringResultContainer calculates the latest results from all tasks and returns them as a ResultContainer (Pointer) as well as any
 func GetRecurringResultContainer() (*ResultContainer, error) {
-	taskAnalysis := NewResultContainer()
 	table, err := persistence.GetRecurring()
 	if err != nil {
-		return taskAnalysis, err
+		return nil, err
 	}
 
+	taskAnalysis := NewResultContainer()
 	taskDurations := make(map[string][]time.Duration)
 	taskBeginning := make(map[string][]time.Time)
 
@@ -126,6 +127,7 @@ func GetRecurringResultContainer() (*ResultContainer, error) {
 	return taskAnalysis, nil
 }
 
+//RecurringExpectedAfter returns the duration after which the task should finish at the latest
 func RecurringExpectedAfter(lp logpoint.LogPoint) (time.Duration, error) {
 	lastRc := NewResultContainer()
 	err := lastRc.LoadLatest()

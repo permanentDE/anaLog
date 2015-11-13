@@ -143,7 +143,7 @@ func (a *Adapter) GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	return lp, err
 }
 
-func (a *Adapter) Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+func (a *Adapter) Find(task, runId, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
 	err := a.session.Ping()
 	if err != nil {
 		return nil, err
@@ -155,6 +155,10 @@ func (a *Adapter) Find(task, host, state, rawRegex string, timeRangeGTE, timeRan
 
 	if task != "" {
 		m["task"] = task
+	}
+
+	if runId != "" {
+		m["runid"] = runId
 	}
 
 	if host != "" {

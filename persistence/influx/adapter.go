@@ -167,6 +167,6 @@ func (a *Adapter) GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	return logpoint.LogPoint{}, fmt.Errorf("%s", "not implemented")
 }
 
-func (a *Adapter) Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+func (a *Adapter) Find(task, runId, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
 	return nil, fmt.Errorf("%s", "not implemented")
 }

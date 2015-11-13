@@ -17,7 +17,7 @@ func provision(r *mux.Router) *mux.Router {
 	r.NotFoundHandler = webapp.Handler(handler.NotFound)
 
 	r.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		http.Redirect(w, req, "/", http.StatusFound)
+		http.Redirect(w, req, "/v1/frontend/index.html", http.StatusFound)
 	})
 
 	v1 := r.PathPrefix("/v1").Subrouter()
@@ -35,6 +35,11 @@ func provision(r *mux.Router) *mux.Router {
 	v1Read := v1.PathPrefix("/read").Methods("GET", "POST").Subrouter()
 	v1Read.Handle("/find/{number}", webapp.Handler(handler.ReadFind))
 	v1Read.Handle("/find", webapp.Handler(handler.ReadFind))
+	v1Read.Handle("/results", webapp.Handler(handler.ReadResults))
+	v1Read.Handle("/problems", webapp.Handler(handler.ReadProblems))
+
+	v1Front := v1.PathPrefix("/frontend").Methods("GET").Subrouter()
+	v1Front.Handle("/{file}", webapp.Handler(handler.FrontendFile))
 
 	return r
 }

@@ -20,6 +20,7 @@ type Result struct {
 	IntervalStdDev time.Duration
 }
 
+//String returns a textual representation of the result
 func (r Result) String() string {
 	return fmt.Sprint("Avg: ", r.Avg, ", StdDev: ", r.StdDev, ", AvgQr: ", r.AvgQr, ", StdDevQr: ", r.StdDevQr, ", IntervalAvg: ", r.IntervalAvg, ", IntervalStdDev: ", r.IntervalStdDev)
 }
@@ -29,18 +30,21 @@ type ResultContainer struct {
 	m  map[string]Result
 }
 
+//NewResultContainer returns a initialized ResultContainer (Pointer)
 func NewResultContainer() *ResultContainer {
 	rc := new(ResultContainer)
 	rc.m = make(map[string]Result)
 	return rc
 }
 
+//Set saves the given Result with the given key
 func (rc *ResultContainer) Set(key string, r Result) {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()
 	rc.m[key] = r
 }
 
+//Get returns the Result associated with the given key
 func (rc *ResultContainer) Get(key string) Result {
 	rc.mu.RLock()
 	defer rc.mu.RUnlock()
@@ -48,17 +52,23 @@ func (rc *ResultContainer) Get(key string) Result {
 	return rc.m[key]
 }
 
+//Range calls the given function for every task in the container
 func (rc *ResultContainer) Range(f func(string, Result)) {
 	rc.mu.RLock()
-	defer rc.mu.RUnlock()
-
+	copy := make(map[string]Result)
 	for key, val := range rc.m {
+		copy[key] = val
+	}
+	rc.mu.RUnlock()
+
+	for key, val := range copy {
 		f(key, val)
 	}
 }
 
 var latestRcCache *ResultContainer = NewResultContainer()
 
+//Store saves the ResultContainer in memory and stores a serialized version in persistence
 func (rc *ResultContainer) Store() error {
 	rc.mu.RLock()
 	defer rc.mu.RUnlock()
@@ -75,6 +85,7 @@ func (rc *ResultContainer) Store() error {
 	return persistence.StoreAnalysisRCserial(serial)
 }
 
+//LoadLatest gets the latest data from memory or the persistence layer
 func (rc *ResultContainer) LoadLatest() error {
 	rc.mu.Lock()
 	defer rc.mu.Unlock()

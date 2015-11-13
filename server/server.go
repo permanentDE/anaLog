@@ -1,15 +1,13 @@
 package server
 
 import (
-	"github.com/codegangsta/negroni"
-	"github.com/goincremental/negroni-sessions"
-	"github.com/goincremental/negroni-sessions/cookiestore"
 	"net"
 	"net/http"
 	"net/http/fcgi"
 
 	"github.com/badgerodon/socketmaster/client"
 	"github.com/badgerodon/socketmaster/protocol"
+	"github.com/codegangsta/negroni"
 	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/iDnegroniLog"
 
@@ -26,10 +24,8 @@ func Listen() {
 
 	logger.Stack2Http = config.AnaLog.DevelopmentEnv
 
-	n := negroni.New(logger /*negroni.NewStatic(http.Dir(helper.GetFilePath("./public")))*/)
+	n := negroni.New(logger)
 
-	cookiestore := cookiestore.New([]byte(config.AnaLog.CookieSecret))
-	n.Use(sessions.Sessions("perm_analog_session", cookiestore))
 	n.Use(negroni.HandlerFunc(preflight))
 
 	n.UseHandler(router.New())

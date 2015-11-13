@@ -32,7 +32,7 @@ type Adapter interface {
 	GetLatestAnalysisRCserial() ([]byte, error)
 	GetEndByStart(logpoint.LogPoint) (logpoint.LogPoint, error)
 	GetLastBegin(string) (logpoint.LogPoint, error)
-	Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error)
+	Find(task, runId, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error)
 	Close() error
 }
 
@@ -82,8 +82,8 @@ func GetLastBegin(taskname string) (logpoint.LogPoint, error) {
 	return getAdapter().GetLastBegin(taskname)
 }
 
-func Find(task, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
-	lps, err := getAdapter().Find(task, host, state, rawRegex, timeRangeGTE, timeRangeLTE, n)
+func Find(task, runId, host, state, rawRegex string, timeRangeGTE, timeRangeLTE time.Time, n uint) ([]logpoint.LogPoint, error) {
+	lps, err := getAdapter().Find(task, runId, host, state, rawRegex, timeRangeGTE, timeRangeLTE, n)
 	if err != nil {
 		return nil, err
 	}

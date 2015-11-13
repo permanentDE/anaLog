@@ -8,6 +8,8 @@ import (
 	idl "go.iondynamics.net/iDlogger"
 )
 
+
+//Avg computes the average duration from the given slice of durations
 func Avg(durations []time.Duration) time.Duration {
 	if len(durations) < 1 {
 		return 0
@@ -21,6 +23,7 @@ func Avg(durations []time.Duration) time.Duration {
 
 }
 
+//StdDev computes the standard deviation from the given slice of durations. 
 func StdDev(durations []time.Duration, precision time.Duration) time.Duration {
 	if len(durations) < 2 {
 		return 0
@@ -76,6 +79,7 @@ func (a ByTime) Len() int           { return len(a) }
 func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTime) Less(i, j int) bool { return a[i].Before(a[j]) }
 
+//DurationsBetween returns the durations between given times
 func DurationsBetween(times []time.Time) []time.Duration {
 	durs := []time.Duration{}
 
@@ -102,6 +106,7 @@ func (a ByDuration) Len() int           { return len(a) }
 func (a ByDuration) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDuration) Less(i, j int) bool { return a[i] < a[j] }
 
+//QuartileReduce returns the given durations without the lowest and highest 25%
 func QuartileReduce(durations []time.Duration) (reduced []time.Duration) {
 	if len(durations) < 1 {
 		return

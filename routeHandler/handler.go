@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	idl "go.iondynamics.net/iDlogger"
 	"go.iondynamics.net/webapp"
 
 	"go.permanent.de/anaLog/config"
+	"go.permanent.de/anaLog/frontend"
 	"go.permanent.de/anaLog/hostnamesec"
 	"go.permanent.de/anaLog/nagios"
 )
@@ -68,5 +70,16 @@ func NagiosReset(w http.ResponseWriter, req *http.Request) *webapp.Error {
 		</html>
 	`)
 
+	return nil
+}
+
+func FrontendFile(w http.ResponseWriter, req *http.Request) *webapp.Error {
+
+	str, ok := frontend.File(mux.Vars(req)["file"])
+	if !ok {
+		http.Error(w, "not found", http.StatusNotFound)
+		return nil
+	}
+	fmt.Fprint(w, str)
 	return nil
 }
