@@ -3,8 +3,6 @@
 UseMongo
 SchedulerInterval = 10s
 GracePeriod = 10s
-Workspace = ./
-CookieSecret = secret
 AdminSecret = secret
 OverrideSecret = secret
 Listen = :3001
